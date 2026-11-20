@@ -24,8 +24,17 @@ def run(cmd):
 
 
 def build_native():
+    # Prefer a pre-built .so from install.sh (system meson). Pip's isolated
+    # build env cannot import Arch's /usr/bin/meson (mesonbuild missing).
+    if os.environ.get("REPYWM_SKIP_NATIVE") == "1" and os.path.isfile("pywm/_pywm.so"):
+        print("+ REPYWM_SKIP_NATIVE=1 — using existing pywm/_pywm.so", flush=True)
+        return
+
+    if os.path.isfile("pywm/_pywm.so") and os.environ.get("REPYWM_FORCE_NATIVE") != "1":
+        print("+ pywm/_pywm.so already present — skip native rebuild", flush=True)
+        return
+
     if os.path.isdir("build"):
-        # Reconfigure in case flags changed; ignore failure and recreate.
         try:
             run(["meson", "setup", "--reconfigure", "build", *MESON_FLAGS])
         except SystemExit:
