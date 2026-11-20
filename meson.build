@@ -44,7 +44,13 @@ math           = meson.get_compiler('c').find_library('m')
 
 has_xwayland = xwayland.found() and get_option('xwayland').enabled()
 
-wlroots        = subproject('wlroots', default_options: ['default_library=static']).get_variable('wlroots')
+# examples=false: vendored wlroots 0.16 fails to build its examples on GCC 14+
+# (-Werror=calloc-transposed-args). We only need the library.
+wlroots        = subproject('wlroots', default_options: [
+    'default_library=static',
+    'examples=false',
+    'werror=false',
+]).get_variable('wlroots')
 
 if has_xwayland
     add_project_arguments(
