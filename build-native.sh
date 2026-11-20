@@ -15,6 +15,9 @@ need_cmd() { command -v "$1" >/dev/null || { echo "missing: $1" >&2; exit 1; }; 
 need_cmd meson
 need_cmd ninja
 
+# Prefer system python for the extension (not a venv without headers).
+export PATH="/usr/bin:/usr/sbin:$PATH"
+
 rm -rf build
 echo "[*] meson setup build ${MESON_FLAGS[*]}"
 meson setup build "${MESON_FLAGS[@]}"
